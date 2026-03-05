@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Resolve script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+JAR="${SCRIPT_DIR}/cobol-check-0.2.9.jar"
+
+if [[ ! -f "${JAR}" ]]; then
+  echo "ERROR: ${JAR} not found. Please place cobol-check-0.2.9.jar in ${SCRIPT_DIR}"
+  exit 1
+fi
+
+# Java 8/11 compatible
+exec java -jar "${JAR}" "$@"
+``
