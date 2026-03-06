@@ -6,9 +6,9 @@ log() { printf "[%(%Y-%m-%d %H:%M:%S)T] %s\n" -1 "$*" >&2; }
 log "➡️ Setting up Java environment"
 java -version
 
-log "➡️ Running COBOL Check from repo root (no launcher)"
+log "➡️ Running COBOL Check from repo root"
 
-JAR="cobol-check/cobol-check-0.2.19.jar"   # adjust if you bump the version file name
+JAR="cobol-check/cobol-check-0.2.19.jar"   # change if you rename the jar
 SRC_MAIN="src/main/cobol"
 SRC_TEST="src/test/cobol"
 
@@ -17,43 +17,26 @@ SRC_TEST="src/test/cobol"
 [[ -d "$SRC_MAIN" ]] || { log "❌ Source folder not found: $SRC_MAIN"; ls -la src || true; exit 1; }
 [[ -d "$SRC_TEST" ]] || { log "❌ Test folder not found: $SRC_TEST"; ls -la src/test || true; exit 1; }
 
-# Show usage so we can see which flags this JAR supports in logs
-log "ℹ️ Dumping --help for this JAR (non-zero exit here is OK on some builds)"
-set +e
-java -jar "$JAR" --help || java -jar "$JAR" -h
-set -e
+# Discover program names from subfolders under src/test/cobol (DEPTPAY, EMPPAY, ...)
+mapfile -t PROGRAMS < <(find "$SRC_TEST" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort)
 
-try_run() {
-  log "➡️ Executing: $*"
-  set +e
-  "$@"
-  rc=$?
-  set -e
-  return $rc
-}
-
-# Try common 0.2.x flag sets in order; stop on first success
-if try_run java -jar "$JAR" --tests "$SRC_TEST" --sources "$SRC_MAIN"; then
-  log "✅ Done with --tests/--sources"
-  exit 0
+# Fallback: if there are .cut files directly under src/test/cobol, use their basenames
+if [[ ${#PROGRAMS[@]} -eq 0 ]]; then
+  mapfile -t PROGRAMS < <(find "$SRC_TEST" -maxdepth 1 -type f -name "*.cut" -printf "%f\n" \
+                          | sed 's/\.cut$//' | sort | uniq)
 fi
 
-if try_run java -jar "$JAR" -t "$SRC_TEST" -s "$SRC_MAIN"; then
-  log "✅ Done with -t/-s"
-  exit 0
+if [[ ${#PROGRAMS[@]} -eq 0 ]]; then
+  log "❌ Could not discover any program names in $SRC_TEST (expect subfolders or .cut files)."
+  ls -la "$SRC_TEST" || true
+  exit 1
 fi
 
-if try_run java -jar "$JAR" --test-root "$SRC_TEST" --source-root "$SRC_MAIN"; then
-  log "✅ Done with --test-root/--source-root"
-  exit 0
-fi
+log "ℹ️ Programs discovered for -p: ${PROGRAMS[*]}"
 
-# Rare older builds: positional argument for test root
-if try_run java -jar "$JAR" "$SRC_TEST"; then
-  log "✅ Done with positional test-root"
-  exit 0
-fi
+# Build the command: -t tests -s sources -p <one or more program names>
+CMD=( java -jar "$JAR" -t "$SRC_TEST" -s "$SRC_MAIN" -p )
+CMD+=( "${PROGRAMS[@]}" )
 
-log "❌ All invocation patterns failed. See the --help usage above to lock exact flags."
-exit 1
-``
+log "➡️ Executing: ${CMD[*]}"
+"${CMD[@]}"
