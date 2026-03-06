@@ -1,0 +1,8 @@
+# Always use LF in scripts and YAML
+*.sh   text eol=lf
+*.bash text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+
+# Let Git normalize text for everything else
+* text=auto
