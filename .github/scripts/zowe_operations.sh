@@ -1,22 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Make sure secrets exist
-: "${ZOWE_USERNAME:?Missing ZOWE_USERNAME secret}"
-: "${ZOWE_PASSWORD:?Missing ZOWE_PASSWORD secret}"
-
-
 echo "➡️ Zowe CLI version:"
-zowe --version || true
+zowe --version
 
+echo "➡️ Creating Zowe CLI profile"
 
-zowe profiles create zosmf \
+zowe profiles create zosmf default \
   --host "$ZOWE_HOST" \
   --port "$ZOWE_PORT" \
   --user "$ZOWE_USERNAME" \
   --password "$ZOWE_PASSWORD" \
   --reject-unauthorized false \
   --ru false
+
 
 # Convert username to lowercase for USS paths
 LOWERCASE_USERNAME="$(printf "%s" "$ZOWE_USERNAME" | tr '[:upper:]' '[:lower:]')"
