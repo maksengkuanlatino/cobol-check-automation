@@ -9,8 +9,8 @@ java -version
 log "➡️ Running COBOL Check from repo root"
 
 JAR="cobol-check/cobol-check-0.2.19.jar"   # change if you rename the jar
-SRC_MAIN="src/main/cobol"
-SRC_TEST="src/test/cobol"
+SRC_MAIN=""
+SRC_TEST=""
 
 # Sanity checks
 [[ -f "$JAR" ]] || { log "❌ JAR not found: $JAR"; ls -la cobol-check || true; exit 1; }
