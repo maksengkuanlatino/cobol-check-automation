@@ -5,4 +5,4 @@
 *.yaml text eol=lf
 
 # Let Git normalize text for everything else
-* text=auto
+* text=auto"*.sh text eol=lf" 
