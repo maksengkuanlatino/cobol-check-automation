@@ -32,7 +32,8 @@ else
 fi
 
 echo "➡️ Uploading COBOL Check directory"
-zowe zos-files upload dir-to-uss "./cobol-check" "${USS_DIR}" --recursive "${ZOPTS[@]}"
+zowe zos-files upload dir-to-uss "./cobol-check" "${USS_DIR}" --recursive "${ZOPTS[@]}" --binary
+
 
 echo "➡️ Listing uploaded files:"
 zowe zos-files list uss-files "${USS_DIR}" "${ZOPTS[@]}"
