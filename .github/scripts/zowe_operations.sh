@@ -5,12 +5,23 @@ set -euo pipefail
 : "${ZOWE_USERNAME:?Missing ZOWE_USERNAME secret}"
 : "${ZOWE_PASSWORD:?Missing ZOWE_PASSWORD secret}"
 
+
+echo "➡️ Zowe CLI version:"
+zowe --version || true
+
+
+zowe profiles create zosmf \
+  --host "$ZOWE_HOST" \
+  --port "$ZOWE_PORT" \
+  --user "$ZOWE_USERNAME" \
+  --password "$ZOWE_PASSWORD" \
+  --reject-unauthorized false \
+  --ru false
+
 # Convert username to lowercase for USS paths
 LOWERCASE_USERNAME="$(printf "%s" "$ZOWE_USERNAME" | tr '[:upper:]' '[:lower:]')"
 USS_DIR="/z/${LOWERCASE_USERNAME}/cobolcheck"
 
-echo "➡️ Zowe CLI version:"
-zowe --version || true
 
 echo "➡️ Checking USS directory: ${USS_DIR}"
 if ! zowe zos-files list uss-files "${USS_DIR}" >/dev/null 2>&1; then
