@@ -1,16 +1,13 @@
 #!/bin/bash
 # zowe_operations.sh
 
-# 1. CREATE TEMPORARY ZOWE PROFILE (Fixes "Timed out waiting for hostname")
-# Replace '192.86.32.250' with the IP provided in your COBOL course if different
-zowe profiles create zosmf-profile default-profile \
-  --host 192.86.32.250 \
-  --port 10443 \
-  --user "$ZOWE_USERNAME" \
-  --pass "$ZOWE_PASSWORD" \
-  --reject-unauthorized false --overwrite
-
-zowe profiles set zosmf default-profile
+# 1. CREATE CONFIGURATION (Modern Zowe Syntax)
+# This replaces the 'profiles' command that was failing
+zowe config set "profiles.zosmf.properties.host" "192.86.32.250" --global
+zowe config set "profiles.zosmf.properties.port" "10443" --global
+zowe config set "profiles.zosmf.properties.user" "$ZOWE_USERNAME" --global
+zowe config set "profiles.zosmf.properties.pass" "$ZOWE_PASSWORD" --global
+zowe config set "profiles.zosmf.properties.rejectUnauthorized" "false" --global
 
 # 2. Setup Variables
 LOWERCASE_USERNAME=$(echo "$ZOWE_USERNAME" | tr '[:upper:]' '[:lower:]')
@@ -23,7 +20,7 @@ else
     echo "Directory already exists."
 fi
 
-# 4. Upload files (Fixes line 14 error by removing the accidental line break)
+# 4. Upload files
 zowe zos-files upload dir-to-uss "./cobol-check" "/z/$LOWERCASE_USERNAME/cobolcheck" --recursive --binary-files "cobol-check-0.2.9.jar"
 
 # 5. Verify upload
