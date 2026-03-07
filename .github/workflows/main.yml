@@ -19,3 +19,10 @@ run: |
 # Here we'll add our commands to run cobolcheck
 echo "Running COBOL Check"
 # Add actual cobolcheck commands here
+- name: Run COBOL Check on Mainframe
+env:
+ZOWE_USERNAME: ${{ secrets.ZOWE_USERNAME }}
+ZOWE_PASSWORD: ${{ secrets.ZOWE_PASSWORD }}
+run: |
+chmod +x .github/scripts/mainframe_operations.sh
+.github/scripts/mainframe_operations.sh
