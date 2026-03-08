@@ -3,7 +3,7 @@
 
 # 1. CREATE CONFIGURATION (Modern Zowe Syntax)
 # This replaces the 'profiles' command that was failing
-zowe config set "profiles.zosmf.properties.host" "192.86.32.250" --global
+zowe config set "profiles.zosmf.properties.host" "204.90.115.200" --global
 zowe config set "profiles.zosmf.properties.port" "10443" --global
 zowe config set "profiles.zosmf.properties.user" "$ZOWE_USERNAME" --global
 zowe config set "profiles.zosmf.properties.pass" "$ZOWE_PASSWORD" --global
