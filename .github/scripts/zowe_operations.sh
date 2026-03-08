@@ -22,9 +22,14 @@ else
     echo "Directory already exists. Skipping mkdir."
 fi
 
-# Upload files (exclude .git folder to avoid binary encoding errors)
-zowe zos-files upload dir-to-uss "." "$TARGET_DIR" \
+# Copy files to a temp dir, strip .git, then upload
+UPLOAD_DIR=$(mktemp -d)
+cp -r . "$UPLOAD_DIR"
+rm -rf "$UPLOAD_DIR/.git"
+
+zowe zos-files upload dir-to-uss "$UPLOAD_DIR" "$TARGET_DIR" \
   --recursive \
   --binary \
-  --exclude-pattern ".git" \
   "${ZOWE_CONN[@]}"
+
+rm -rf "$UPLOAD_DIR"
